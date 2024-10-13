@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Go to the Moon</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Russo+One&display=swap");
+
+      body {
+        font-family: "Orbitron", sans-serif;
+        background-color: #001f3f; /* Dark blue background */
+        color: #ffffff; /* White text */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        font-family: "Russo One", sans-serif;
+        font-size: 4em;
+        background: linear-gradient(90deg, #ff00cc, #3333ff);
+        -webkit-background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        animation: glow 2s infinite alternate;
+        margin-bottom: 0.5em;
+        letter-spacing: 5px;
+      }
+
+      p {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.5em;
+        color: #ffccff;
+        text-shadow: 0 0 8px rgba(255, 204, 255, 0.8);
+        margin-bottom: 1.5em;
+        animation: glow 1.5s infinite alternate;
+      }
+
+      /* Rocket Body */
+      .rocket {
+        position: relative;
+        width: 80px;
+        height: 200px;
+        background: linear-gradient(135deg, #e6e6e6 0%, #b3b3b3 100%);
+        border-radius: 40px 40px 0 0;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        margin: 0 auto;
+        transition: transform 2s ease-in-out;
+      }
+
+      /* Rocket Fin (Left) */
+      .rocket:before {
+        content: "";
+        position: absolute;
+        top: 65%;
+        left: -30px;
+        width: 30px;
+        height: 60px;
+        background-color: #ff4747;
+        clip-path: polygon(0 0, 100% 50%, 0% 100%);
+        box-shadow: 0 0 10px rgba(255, 71, 71, 0.8);
+      }
+
+      /* Rocket Fin (Right) */
+      .rocket:after {
+        content: "";
+        position: absolute;
+        top: 65%;
+        right: -30px;
+        width: 30px;
+        height: 60px;
+        background-color: #ff4747;
+        clip-path: polygon(0 0, 100% 50%, 0% 100%);
+        box-shadow: 0 0 10px rgba(255, 71, 71, 0.8);
+      }
+
+      /* Rocket Window */
+      .window {
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background-color: #1f1f1f;
+        border: 4px solid #fff;
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      }
+
+      /* Rocket Flame */
+      .flame {
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 80px;
+        background: radial-gradient(circle, #ff6600, #ff3300);
+        border-radius: 50% 50% 0 0;
+        animation: flameFlicker 0.2s infinite alternate;
+        box-shadow: 0 0 30px rgba(255, 102, 0, 0.8);
+      }
+
+      /* Smoke trail */
+      .smoke {
+        position: absolute;
+        bottom: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 40px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.4),
+          rgba(255, 255, 255, 0)
+        );
+        filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      /* Button Styling */
+      .launch-btn {
+        background-color: #ff006e;
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        padding: 15px 30px;
+        font-size: 1.2em;
+        font-family: "Russo One", sans-serif;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease,
+          transform 0.3s ease;
+        position: relative;
+        z-index: 1;
+      }
+
+      .launch-btn:hover {
+        background-color: #ff3f8e;
+        box-shadow: 0 0 15px 5px rgba(255, 0, 110, 0.6);
+        transform: scale(1.05);
+      }
+
+      .launch-btn:active {
+        background-color: #ff69b4;
+        box-shadow: 0 0 20px 10px rgba(255, 0, 110, 0.8);
+      }
+
+      /* Rocket Launch Animation */
+      .rocket.launching {
+        transform: translateY(-1000px);
+      }
+
+      /* Enhanced Stars */
+      .star {
+        position: absolute;
+        width: 4px; /* Increase size */
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Glow effect */
+        animation: twinkle 5s infinite ease-in-out;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* Generate random stars */
+      .stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .stars div {
+        position: absolute;
+        top: calc(100vh * var(--y));
+        left: calc(100vw * var(--x));
+      }
+
+      /* Glow Animation */
+      @keyframes glow {
+        0% {
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        100% {
+          text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+        }
+      }
+
+      /* Flame Flicker Animation */
+      @keyframes flameFlicker {
+        0% {
+          transform: scaleY(1);
+        }
+        100% {
+          transform: scaleY(1.2);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stars">
+      <!-- Randomly placed stars with increased size and glow effect -->
+      <div class="star" style="--x: 0.1; --y: 0.1"></div>
+      <div class="star" style="--x: 0.3; --y: 0.4"></div>
+      <div class="star" style="--x: 0.5; --y: 0.7"></div>
+      <div class="star" style="--x: 0.8; --y: 0.2"></div>
+      <div class="star" style="--x: 0.2; --y: 0.8"></div>
+      <div class="star" style="--x: 0.9; --y: 0.5"></div>
+      <div class="star" style="--x: 0.7; --y: 0.1"></div>
+    </div>
+
+    <div class="container">
+      <h1>Launch to the Moon!</h1>
+      <p>Get ready for a stellar adventure...</p>
+
+      <div class="rocket">
+        <div class="window"></div>
+        <div class="flame"></div>
+        <div class="smoke"></div>
+      </div>
+
+      <button class="launch-btn" onclick="launchRocket()">Launch Rocket</button>
+    </div>
+
+    <script>
+      function launchRocket() {
+        const rocket = document.querySelector(".rocket");
+        rocket.classList.add("launching");
+        const smoke = document.querySelector(".smoke");
+        smoke.style.opacity = 1;
+      }
+    </script>
+  </body>
+</html>
